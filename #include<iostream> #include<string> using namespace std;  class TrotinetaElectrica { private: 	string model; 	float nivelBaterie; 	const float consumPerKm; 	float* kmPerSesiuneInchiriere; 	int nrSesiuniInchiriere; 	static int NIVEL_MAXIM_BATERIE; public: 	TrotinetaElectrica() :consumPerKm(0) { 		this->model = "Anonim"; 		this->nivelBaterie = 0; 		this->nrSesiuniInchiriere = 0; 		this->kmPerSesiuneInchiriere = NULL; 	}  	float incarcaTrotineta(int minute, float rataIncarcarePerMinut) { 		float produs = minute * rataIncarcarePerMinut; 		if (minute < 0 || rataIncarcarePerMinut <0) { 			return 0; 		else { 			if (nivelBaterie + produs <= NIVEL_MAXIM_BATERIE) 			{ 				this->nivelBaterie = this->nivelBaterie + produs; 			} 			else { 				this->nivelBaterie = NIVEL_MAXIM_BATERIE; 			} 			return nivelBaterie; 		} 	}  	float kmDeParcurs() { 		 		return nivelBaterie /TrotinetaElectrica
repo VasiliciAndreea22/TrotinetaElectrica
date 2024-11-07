@@ -1,0 +1,258 @@
+#include<iostream>
+#include<string>
+using namespace std;
+
+class TrotinetaElectrica {
+private:
+	string model;
+	float nivelBaterie;
+	const float consumPerKm;
+	float* kmPerSesiuneInchiriere;
+	int nrSesiuniInchiriere;
+	static int NIVEL_MAXIM_BATERIE;
+public:
+	TrotinetaElectrica() :consumPerKm(0) {
+		this->model = "Anonim";
+		this->nivelBaterie = 0;
+		this->nrSesiuniInchiriere = 0;
+		this->kmPerSesiuneInchiriere = NULL;
+	}
+
+	float incarcaTrotineta(int minute, float rataIncarcarePerMinut) {
+		float produs = minute * rataIncarcarePerMinut;
+		if (minute < 0 || rataIncarcarePerMinut <0) {
+			return 0;
+		else {
+			if (nivelBaterie + produs <= NIVEL_MAXIM_BATERIE)
+			{
+				this->nivelBaterie = this->nivelBaterie + produs;
+			}
+			else {
+				this->nivelBaterie = NIVEL_MAXIM_BATERIE;
+			}
+			return nivelBaterie;
+		}
+	}
+
+	float kmDeParcurs() {
+		
+		return nivelBaterie / consumPerKm;
+	}
+
+	string getModel() {
+		return this->model;
+	}
+
+	int getNrSesiuniInchiriere() {
+		return this->nrSesiuniInchiriere;
+	}
+
+	float getNivelBaterie() {
+		return this->nivelBaterie;
+	}
+
+	~TrotinetaElectrica() {
+		if (this->kmPerSesiuneInchiriere != NULL) {
+			delete[] this->kmPerSesiuneInchiriere;
+		}
+	}
+
+	void utilizeazaTrotineta(float sesiuneNouaKM) {
+		TrotinetaElectrica copie = *this;
+		if (this->kmPerSesiuneInchiriere != NULL) {
+			delete[] this->kmPerSesiuneInchiriere;
+		}
+		this->nrSesiuniInchiriere++;
+		this->kmPerSesiuneInchiriere = new float[this->nrSesiuniInchiriere];
+		for (int i = 0; i < copie.nrSesiuniInchiriere; i++) {
+			this->kmPerSesiuneInchiriere[i] = copie.kmPerSesiuneInchiriere[i];
+		}
+
+		this->kmPerSesiuneInchiriere[this->nrSesiuniInchiriere - 1] = sesiuneNouaKM;
+
+	}
+
+	TrotinetaElectrica(string model, float nivelBaterie, float consumPerKm, int nrSesiuniInchiriere, float* kmPerSesiuneInchiriere) :consumPerKm(consumPerKm) {
+		this->model = model;
+		if (nivelBaterie > 0 && nivelBaterie <= NIVEL_MAXIM_BATERIE) {
+			this->nivelBaterie = nivelBaterie;
+		}
+		else {
+			this->nivelBaterie = NIVEL_MAXIM_BATERIE;
+		}
+
+		if (nrSesiuniInchiriere > 0 && kmPerSesiuneInchiriere != NULL) {
+			this->nrSesiuniInchiriere = nrSesiuniInchiriere;
+			this->kmPerSesiuneInchiriere = new float[this->nrSesiuniInchiriere];
+			for (int i = 0; i < this->nrSesiuniInchiriere; i++)
+			{
+				this->kmPerSesiuneInchiriere[i] = kmPerSesiuneInchiriere[i];
+			}
+		}
+		else {
+			this->nrSesiuniInchiriere = 0;
+			this->kmPerSesiuneInchiriere = NULL;
+		}
+
+	}
+
+	TrotinetaElectrica(const TrotinetaElectrica& te) :consumPerKm(te.consumPerKm) {
+		this->model = te.model;
+		if (te.nivelBaterie >= 0 && te.nivelBaterie <= NIVEL_MAXIM_BATERIE) {
+			this->nivelBaterie = te.nivelBaterie;
+		}
+		else {
+			this->nivelBaterie = NIVEL_MAXIM_BATERIE;
+		}
+
+		if (te.nrSesiuniInchiriere > 0 && te.kmPerSesiuneInchiriere != NULL) {
+			this->nrSesiuniInchiriere = te.nrSesiuniInchiriere;
+			this->kmPerSesiuneInchiriere = new float[this->nrSesiuniInchiriere];
+			for (int i = 0; i < this->nrSesiuniInchiriere; i++)
+			{
+				this->kmPerSesiuneInchiriere[i] = te.kmPerSesiuneInchiriere[i];
+			}
+		}
+		else {
+			this->nrSesiuniInchiriere = 0;
+			this->kmPerSesiuneInchiriere = NULL;
+		}
+	}
+
+	float operator()(int a, int b) {
+		float sum = 0;
+		if (a >= 0 && b < this->nrSesiuniInchiriere) {
+			for (int i = a; i <= b; i++) {
+				sum += this->kmPerSesiuneInchiriere[i];
+			}
+		}
+		return sum;
+	}
+
+	TrotinetaElectrica& operator=(const TrotinetaElectrica& te) {
+		if (this != &te) {
+			if (this->kmPerSesiuneInchiriere != NULL) {
+				delete[] this->kmPerSesiuneInchiriere;
+			}
+			this->model = te.model;
+			if (te.nivelBaterie >= 0 && te.nivelBaterie <= NIVEL_MAXIM_BATERIE) {
+				this->nivelBaterie = te.nivelBaterie;
+			}
+			else {
+				this->nivelBaterie = NIVEL_MAXIM_BATERIE;
+			}
+
+			if (te.nrSesiuniInchiriere > 0 && te.kmPerSesiuneInchiriere != NULL) {
+				this->nrSesiuniInchiriere = te.nrSesiuniInchiriere;
+				this->kmPerSesiuneInchiriere = new float[this->nrSesiuniInchiriere];
+				for (int i = 0; i < this->nrSesiuniInchiriere; i++)
+				{
+					this->kmPerSesiuneInchiriere[i] = te.kmPerSesiuneInchiriere[i];
+				}
+			}
+			else {
+				this->nrSesiuniInchiriere = 0;
+				this->kmPerSesiuneInchiriere = NULL;
+			}
+
+		}
+		return *this;
+	}
+
+
+	friend ostream& operator <<(ostream& out, const TrotinetaElectrica& t) {
+		out << t.model << endl;
+		cout << t.nivelBaterie << endl;
+		cout << t.consumPerKm << endl;
+		cout << t.nrSesiuniInchiriere << endl;
+		for (int i = 0; i < t.nrSesiuniInchiriere; i++) {
+			out << t.kmPerSesiuneInchiriere[i] << endl;
+		}
+		out << endl;
+		return out;
+	}
+
+	friend istream& operator >> (istream& in, TrotinetaElectrica& t) {
+		if (t.kmPerSesiuneInchiriere != NULL) {
+			delete[] t.kmPerSesiuneInchiriere;
+		}
+
+		cout << "Citeste datele: 1)Model, 2)Nivel Baterie, 3) NrSesiuni, 4)KmSesiuni)"<<endl;
+		cout << "1): ";
+		in >> t.model;
+		cout << "2): ";
+		in >> t.nivelBaterie;
+		cout << "3): ";
+		in >> t.nrSesiuniInchiriere;
+		cout << "4): ";
+		t.kmPerSesiuneInchiriere = new float[t.nrSesiuniInchiriere];
+		for (int i = 0; i < t.nrSesiuniInchiriere; i++) {
+			cout << " ";
+			in >> t.kmPerSesiuneInchiriere[i];
+		}
+		return in;
+
+	}
+
+	friend TrotinetaElectrica operator +(float km, TrotinetaElectrica te) {
+		TrotinetaElectrica copie = te;
+		if (copie.kmPerSesiuneInchiriere != NULL) {
+			delete[] copie.kmPerSesiuneInchiriere;
+		}
+		copie.nrSesiuniInchiriere++;
+		copie.kmPerSesiuneInchiriere = new float[copie.nrSesiuniInchiriere];
+		for (int i = 0; i < te.nrSesiuniInchiriere; i++) {
+			copie.kmPerSesiuneInchiriere[i] = te.kmPerSesiuneInchiriere[i];
+		}
+
+		copie.kmPerSesiuneInchiriere[copie.nrSesiuniInchiriere - 1] = km;
+		return copie;
+	}
+
+
+	
+};
+
+int TrotinetaElectrica::NIVEL_MAXIM_BATERIE = 100;
+
+
+int main() {
+
+	TrotinetaElectrica t;
+	float sesiuniKm[] = {43.1,43.3,13.22,11.4,1.5,12,4.5 };
+	TrotinetaElectrica t1("", 88.7, 2.1, 6, sesiuniKm);
+	cout << t.getModel() << endl;
+	cout << t.getNrSesiuniInchiriere() << endl;
+	cout << t.getNivelBaterie() << endl;
+	cout << t1.getModel() << endl;
+	cout << t1.getNrSesiuniInchiriere() << endl;
+	cout << t1.getNivelBaterie() << endl;
+	t1.utilizeazaTrotineta(41.5);
+	cout << t1.getNivelBaterie() << endl;
+
+
+	TrotinetaElectrica t2 = t;
+	cout << t2.getModel() << endl;
+	cout << t2.getNrSesiuniInchiriere() << endl;
+	cout << t2.getNivelBaterie() << endl;
+	t1.incarcaTrotineta(20, 2);
+	cout << t1.getNivelBaterie() << endl;
+	cout << t1.kmDeParcurs() << endl;
+
+	t = t1;
+	cout << t.getModel() << endl;
+	cout << t.getNrSesiuniInchiriere() << endl;
+	cout << t.getNivelBaterie() << endl;
+	cout << t << endl;
+	cout << t1 << endl;
+	cin >> t;
+	cout << t << endl;
+	t = 10 + t1;
+	cout << endl << t << endl;
+	cout << endl << t1 << endl;
+	cout << t1(2, 4) << endl;
+
+
+
+
+}
